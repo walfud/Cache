@@ -47,7 +47,7 @@ public class MainActivity extends Activity {
                     } catch (Exception e) {
                         e.printStackTrace();
                     }
-                    mCache.set(String.valueOf(position), bitmap);
+                    mCache.add(String.valueOf(position), bitmap);
                 }
                 holder.iv.setImageBitmap(bitmap);
             }

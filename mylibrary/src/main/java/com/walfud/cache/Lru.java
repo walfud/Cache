@@ -27,7 +27,7 @@ public class Lru<T> {
     /**
      * @param value
      */
-    public void set(String key, T value) {
+    public void add(String key, T value) {
         remove(key);
         doAdd(new Entry<>(key, value));
     }

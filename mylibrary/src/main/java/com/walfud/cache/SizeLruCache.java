@@ -46,8 +46,8 @@ public abstract class SizeLruCache<T> implements Cache<T>, Sizable<T> {
     }
 
     @Override
-    public void set(String key, T value) {
-        mLru.set(key, value);
+    public void add(String key, T value) {
+        mLru.add(key, value);
     }
 
     @Override

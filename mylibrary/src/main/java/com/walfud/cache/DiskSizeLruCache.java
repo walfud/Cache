@@ -64,15 +64,15 @@ public abstract class DiskSizeLruCache<T> implements Cache<T>, SerializableAndDe
         mCacheDir.mkdirs();
         String jsonIndex = IoUtils.read(mIndexFile);
         mIndex = new Gson().fromJson(ObjectUtils.getOpt(jsonIndex, "{}"), Map.class);
-        mIndex.forEach((key, filename) -> mCacheImpl.set(filename, new File(mCacheDir, filename)));
+        mIndex.forEach((key, filename) -> mCacheImpl.add(filename, new File(mCacheDir, filename)));
     }
 
     @Override
-    public void set(String key, T value) {
+    public void add(String key, T value) {
         String filename = HashUtils.md5(key);
         byte[] data = serialize(value);
         File tmpFile = IoUtils.output(new File(mCacheDir, toTmpFilename(filename)), data);
-        mCacheImpl.set(filename, tmpFile);
+        mCacheImpl.add(filename, tmpFile);
 
         mIndex.put(key, filename);
         syncIndex();
