@@ -13,15 +13,15 @@ public abstract class SizeCacheManager<T> implements Cache<T>, Sizable<T>, Seria
     private MemorySizeLruCache<T> mMemoryCache;
     private DiskSizeLruCache<T> mDiskCache;
 
-    public SizeCacheManager(Context context) {
+    public SizeCacheManager(Context context, long memoryCacheCapability, long diskCacheCapability) {
         mContext = context;
-        mMemoryCache = new MemorySizeLruCache<T>(100 * 1024 * 1024) {
+        mMemoryCache = new MemorySizeLruCache<T>(memoryCacheCapability) {
             @Override
             public long getSize(T value) {
                 return SizeCacheManager.this.getSize(value);
             }
         };
-        mDiskCache = new DiskSizeLruCache<T>(mContext, 1 * 1024 * 1024) {
+        mDiskCache = new DiskSizeLruCache<T>(mContext, diskCacheCapability) {
             @Override
             public byte[] serialize(T value) {
                 return SizeCacheManager.this.serialize(value);

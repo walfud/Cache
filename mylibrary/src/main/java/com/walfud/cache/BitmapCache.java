@@ -11,8 +11,8 @@ import java.io.ByteArrayOutputStream;
  */
 
 public class BitmapCache extends SizeCacheManager<Bitmap> {
-    public BitmapCache(Context context) {
-        super(context);
+    public BitmapCache(Context context, long memoryCacheCapability, long diskCacheCapability) {
+        super(context, memoryCacheCapability, diskCacheCapability);
     }
 
     @Override
