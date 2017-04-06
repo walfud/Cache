@@ -25,6 +25,7 @@ public class Lru<T> {
     }
 
     /**
+     * Add to lru queue. If exists, move it to first
      * @param value
      */
     public void add(String key, T value) {
