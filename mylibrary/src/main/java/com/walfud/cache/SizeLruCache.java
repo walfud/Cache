@@ -5,7 +5,7 @@ import android.util.Log;
 /**
  * Created by walfud on 2015/11/15.
  */
-public abstract class SizeLruCache<T> extends Cache<T> {
+public abstract class SizeLruCache<T> implements Cache<T>, Sizable<T> {
 
     public static final String TAG = "SizeLruCache";
 
@@ -56,14 +56,11 @@ public abstract class SizeLruCache<T> extends Cache<T> {
     }
 
     @Override
-    public void remove(String regKey) {
+    public void invalidate(String regKey) {
         mLru.remove(regKey);
     }
 
     public void setOnEventListener(Lru.OnEventListener<T> onEventListener) {
         mOnEventListener = onEventListener;
     }
-
-    //
-    public abstract long getSize(T value);
 }

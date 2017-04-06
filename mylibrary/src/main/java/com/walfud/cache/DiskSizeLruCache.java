@@ -17,7 +17,7 @@ import java.util.regex.Pattern;
  * Created by walfud on 2017/4/6.
  */
 
-public abstract class DiskSizeLruCache<T> extends Cache<T> {
+public abstract class DiskSizeLruCache<T> implements Cache<T>, SerializableAndDeserializable<T> {
 
     public static final String TAG = "DiskSizeLruCache";
 
@@ -84,7 +84,7 @@ public abstract class DiskSizeLruCache<T> extends Cache<T> {
     }
 
     @Override
-    public void remove(String regKey) {
+    public void invalidate(String regKey) {
         Pattern pattern = Pattern.compile(regKey);
         List<String> toRemoveList = new ArrayList<>();
         mIndex.forEach((key, filename) -> {
@@ -92,11 +92,8 @@ public abstract class DiskSizeLruCache<T> extends Cache<T> {
                 toRemoveList.add(filename);
             }
         });
-        toRemoveList.forEach(mCacheImpl::remove);
+        toRemoveList.forEach(mCacheImpl::invalidate);
     }
-
-    public abstract byte[] serialize(T value);
-    public abstract T deserialize(byte[] bytes);
 
     // internal
     private void syncIndex() {

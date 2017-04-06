@@ -13,14 +13,15 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.walfud.cache.BitmapCacheManager;
+import com.walfud.cache.BitmapCache;
+import com.walfud.cache.Cache;
 
 public class MainActivity extends Activity {
 
     public static final String TAG = "CacheDemo";
 
     private RecyclerView mRv;
-    private BitmapCacheManager mBitmapCacheManager;
+    private Cache<Bitmap> mCache;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -36,7 +37,7 @@ public class MainActivity extends Activity {
 
             @Override
             public void onBindViewHolder(ViewHolder holder, int position) {
-                Bitmap bitmap = mBitmapCacheManager.get(String.valueOf(position));
+                Bitmap bitmap = mCache.get(String.valueOf(position));
                 if (bitmap != null) {
                     Log.e(TAG, "onBindViewHolder: " + "hit: " + position);
                 } else {
@@ -46,7 +47,7 @@ public class MainActivity extends Activity {
                     } catch (Exception e) {
                         e.printStackTrace();
                     }
-                    mBitmapCacheManager.set(String.valueOf(position), bitmap);
+                    mCache.set(String.valueOf(position), bitmap);
                 }
                 holder.iv.setImageBitmap(bitmap);
             }
@@ -58,7 +59,7 @@ public class MainActivity extends Activity {
         });
 
         //
-        mBitmapCacheManager = new BitmapCacheManager(this);
+        mCache = new BitmapCache(this);
     }
 
     private static class ViewHolder extends RecyclerView.ViewHolder {
