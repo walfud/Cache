@@ -1,6 +1,7 @@
 package com.walfud.cache;
 
 import android.content.Context;
+import android.util.Log;
 
 /**
  * Created by walfud on 2015/11/15.
@@ -42,9 +43,19 @@ public abstract class SizeCacheManager<T> implements Cache<T>, Sizable<T>, Seria
         T value = null;
         if (memory) {
             value = mMemoryCache.get(key);
+            if (value != null) {
+                Log.v(TAG, String.format("hit(memory): %s", key));
+            }
         }
         if (value == null && disk) {
             value = mDiskCache.get(key);
+            if (value != null) {
+                Log.v(TAG, String.format("hit(disk): %s", key));
+            }
+        }
+
+        if (value == null) {
+            Log.v(TAG, String.format("miss: %s", key));
         }
 
         return value;

@@ -20,7 +20,7 @@ public abstract class SizeLruCache<T> implements Cache<T>, Sizable<T> {
 
             @Override
             public void onAdd(String key, T value) {
-                Log.e(TAG, "onAdd: " + key);
+                Log.v(TAG, "onAdd: " + key);
 
                 mCacheSize += getSize(value);
 
@@ -33,7 +33,7 @@ public abstract class SizeLruCache<T> implements Cache<T>, Sizable<T> {
 
             @Override
             public void onRemove(String key, T value) {
-                Log.e(TAG, "onRemove: " + key);
+                Log.v(TAG, "onRemove: " + key);
 
                 mCacheSize -= getSize(value);
 
