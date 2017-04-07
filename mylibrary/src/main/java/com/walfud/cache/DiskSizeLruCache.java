@@ -38,7 +38,8 @@ public abstract class DiskSizeLruCache<T> implements Cache<T>, SerializableAndDe
         mCacheImpl.setOnEventListener(new Lru.OnEventListener<File>() {
             @Override
             public void onAdd(String key, File value) {
-                value.renameTo(new File(mCacheDir, HashUtils.md5(key)));
+                File tmpFile = toTmpFile(value);
+                tmpFile.renameTo(new File(mCacheDir, HashUtils.md5(key)));
                 syncIndex();
             }
 
@@ -110,8 +111,9 @@ public abstract class DiskSizeLruCache<T> implements Cache<T>, SerializableAndDe
 
         String filename = HashUtils.md5(key);
         byte[] data = serialize(value);
-        File tmpFile = IoUtils.output(new File(mCacheDir, filename + ".tmp"), data);
-        mCacheImpl.add(key, tmpFile);
+        File file = new File(mCacheDir, filename);
+        IoUtils.output(toTmpFile(file), data);
+        mCacheImpl.add(key, file);
     }
 
     @Override
@@ -127,6 +129,9 @@ public abstract class DiskSizeLruCache<T> implements Cache<T>, SerializableAndDe
     }
 
     // internal
+    private File toTmpFile(File file) {
+        return new File(file.getAbsolutePath() + ".tmp");
+    }
     private void syncIndex() {
         IoUtils.write(mIndexFile, mCacheImpl.toString());
     }
