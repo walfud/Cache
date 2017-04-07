@@ -63,4 +63,9 @@ public abstract class SizeLruCache<T> implements Cache<T>, Sizable<T> {
     public void setOnEventListener(Lru.OnEventListener<T> onEventListener) {
         mOnEventListener = onEventListener;
     }
+
+    @Override
+    public String toString() {
+        return mLru.toString();
+    }
 }

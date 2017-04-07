@@ -1,5 +1,6 @@
 package com.walfud.cache;
 
+import com.google.gson.Gson;
 import com.walfud.walle.collection.CollectionUtils;
 import com.walfud.walle.lang.ObjectUtils;
 
@@ -17,6 +18,11 @@ public class Lru<T> {
 
     private Deque<Entry<T>> mContainer = new ArrayDeque<>();
     private OnEventListener mOnEventListener;
+
+    @Override
+    public String toString() {
+        return new Gson().toJson(mContainer);
+    }
 
     // Function
 
@@ -94,7 +100,7 @@ public class Lru<T> {
     }
 
     //
-    private static class Entry<T> {
+    static class Entry<T> {
         public String key;
         public T value;
 

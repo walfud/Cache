@@ -8,10 +8,9 @@ import com.walfud.walle.io.IoUtils;
 import com.walfud.walle.lang.ObjectUtils;
 
 import java.io.File;
-import java.util.ArrayList;
+import java.lang.reflect.ParameterizedType;
+import java.lang.reflect.Type;
 import java.util.List;
-import java.util.Map;
-import java.util.regex.Pattern;
 
 /**
  * Created by walfud on 2017/4/6.
@@ -23,7 +22,6 @@ public abstract class DiskSizeLruCache<T> implements Cache<T>, SerializableAndDe
 
     private Context mContext;
     private File mCacheDir;
-    private Map<String, String> mIndex;     // `.first` -> origin key, `.second` -> filename
     private File mIndexFile;
     private SizeLruCache<File> mCacheImpl;  // key: origin key, value: webp file
 
@@ -40,22 +38,13 @@ public abstract class DiskSizeLruCache<T> implements Cache<T>, SerializableAndDe
         mCacheImpl.setOnEventListener(new Lru.OnEventListener<File>() {
             @Override
             public void onAdd(String key, File value) {
-                String filename = fromTmpFilename(value.getName());
-
-                value.renameTo(new File(mCacheDir, filename));
+                value.renameTo(new File(mCacheDir, HashUtils.md5(key)));
+                syncIndex();
             }
 
             @Override
             public void onRemove(String key, File value) {
                 value.delete();
-
-                List<String> toRemoveList = new ArrayList<>();
-                mIndex.forEach((k, f) -> {
-                    if (ObjectUtils.isEqual(f, key)) {
-                        toRemoveList.add(k);
-                    }
-                });
-                toRemoveList.forEach(mIndex::remove);
                 syncIndex();
             }
         });
@@ -63,51 +52,82 @@ public abstract class DiskSizeLruCache<T> implements Cache<T>, SerializableAndDe
         // Init
         mCacheDir.mkdirs();
         String jsonIndex = IoUtils.read(mIndexFile);
-        mIndex = new Gson().fromJson(ObjectUtils.getOpt(jsonIndex, "{}"), Map.class);
-        mIndex.forEach((key, filename) -> mCacheImpl.add(filename, new File(mCacheDir, filename)));
+        List<Lru.Entry<File>> kv = new Gson().fromJson(ObjectUtils.getOpt(jsonIndex, "[]"), new ParameterizedType() {
+            @Override
+            public Type[] getActualTypeArguments() {
+                return new Type[]{new ParameterizedType() {
+                    @Override
+                    public Type[] getActualTypeArguments() {
+                        return new Type[]{File.class};
+                    }
+
+                    @Override
+                    public Type getRawType() {
+                        return Lru.Entry.class;
+                    }
+
+                    @Override
+                    public Type getOwnerType() {
+                        return null;
+                    }
+                }};
+            }
+
+            @Override
+            public Type getRawType() {
+                return List.class;
+            }
+
+            @Override
+            public Type getOwnerType() {
+                return new ParameterizedType() {
+                    @Override
+                    public Type[] getActualTypeArguments() {
+                        return new Type[]{File.class};
+                    }
+
+                    @Override
+                    public Type getRawType() {
+                        return Lru.class;
+                    }
+
+                    @Override
+                    public Type getOwnerType() {
+                        return null;
+                    }
+                };
+            }
+        });
+        kv.forEach(entry -> mCacheImpl.add(entry.key, entry.value));
     }
 
     @Override
     public void add(String key, T value) {
+        File old = mCacheImpl.get(key);
+        if (old != null) {
+            return;
+        }
+
         String filename = HashUtils.md5(key);
         byte[] data = serialize(value);
-        File tmpFile = IoUtils.output(new File(mCacheDir, toTmpFilename(filename)), data);
-        mCacheImpl.add(filename, tmpFile);
-
-        mIndex.put(key, filename);
-        syncIndex();
+        File tmpFile = IoUtils.output(new File(mCacheDir, filename + ".tmp"), data);
+        mCacheImpl.add(key, tmpFile);
     }
 
     @Override
     public T get(String key) {
-        String filename = mIndex.get(key);
-        File file = mCacheImpl.get(filename);
+        File file = mCacheImpl.get(key);
         byte[] data = IoUtils.input(file);
         return deserialize(data);
     }
 
     @Override
     public void invalidate(String regKey) {
-        Pattern pattern = Pattern.compile(regKey);
-        List<String> toRemoveList = new ArrayList<>();
-        mIndex.forEach((key, filename) -> {
-            if (pattern.matcher(key).matches()) {
-                toRemoveList.add(filename);
-            }
-        });
-        toRemoveList.forEach(mCacheImpl::invalidate);
+        mCacheImpl.invalidate(regKey);
     }
 
     // internal
-    private String toTmpFilename(String filename) {
-        return filename + ".tmp";
-    }
-
-    private String fromTmpFilename(String tmpFilename) {
-        return tmpFilename.replace(".tmp", "");
-    }
-
     private void syncIndex() {
-        IoUtils.write(mIndexFile, new Gson().toJson(mIndex));
+        IoUtils.write(mIndexFile, mCacheImpl.toString());
     }
 }
