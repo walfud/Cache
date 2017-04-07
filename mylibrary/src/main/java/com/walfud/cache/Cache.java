@@ -11,5 +11,5 @@ public interface Cache<T> {
 
     T get(String key);
 
-    void invalidate(String rgxKey);
+    void invalidate(String key);
 }

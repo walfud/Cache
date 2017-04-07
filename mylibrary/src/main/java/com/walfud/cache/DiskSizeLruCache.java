@@ -32,7 +32,7 @@ public abstract class DiskSizeLruCache<T> implements Cache<T>, SerializableAndDe
         mCacheImpl = new SizeLruCache<File>(cacheCapability) {
             @Override
             public long getSize(File value) {
-                return value.length();
+                return value.length() + toTmpFile(value).length();
             }
         };
         mCacheImpl.setOnEventListener(new Lru.OnEventListener<File>() {
@@ -124,8 +124,8 @@ public abstract class DiskSizeLruCache<T> implements Cache<T>, SerializableAndDe
     }
 
     @Override
-    public void invalidate(String regKey) {
-        mCacheImpl.invalidate(regKey);
+    public void invalidate(String key) {
+        mCacheImpl.invalidate(key);
     }
 
     // internal

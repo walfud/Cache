@@ -56,8 +56,8 @@ public abstract class SizeLruCache<T> implements Cache<T>, Sizable<T> {
     }
 
     @Override
-    public void invalidate(String regKey) {
-        mLru.remove(regKey);
+    public void invalidate(String key) {
+        mLru.remove(key);
     }
 
     public void setOnEventListener(Lru.OnEventListener<T> onEventListener) {

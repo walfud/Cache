@@ -56,13 +56,12 @@ public class Lru<T> {
 
     /**
      *
-     * @param keyRgx    
+     * @param key
      */
-    public void remove(String keyRgx) {
+    public void remove(String key) {
         List<Entry<T>> toRemoveList = new ArrayList<>();
         mContainer.forEach(entry -> {
-            String key = entry.key;
-            if (key.matches(keyRgx)) {
+            if (ObjectUtils.isEqual(entry.key, key)) {
                 toRemoveList.add(entry);
             }
         });

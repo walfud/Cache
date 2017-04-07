@@ -72,15 +72,15 @@ public abstract class SizeCacheManager<T> implements Cache<T>, Sizable<T>, Seria
             mDiskCache.add(key, value);
         }
     }
-    public void invalidate(String regKey) {
-        invalidate(regKey, true, true);
+    public void invalidate(String key) {
+        invalidate(key, true, true);
     }
-    public void invalidate(String regKey, boolean memory, boolean disk) {
+    public void invalidate(String key, boolean memory, boolean disk) {
         if (memory) {
-            mMemoryCache.invalidate(regKey);
+            mMemoryCache.invalidate(key);
         }
         if (disk) {
-            mDiskCache.invalidate(regKey);
+            mDiskCache.invalidate(key);
         }
     }
 }
