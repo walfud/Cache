@@ -62,7 +62,7 @@ public class Lru<T> {
         List<Entry<T>> toRemoveList = new ArrayList<>();
         mContainer.forEach(entry -> {
             String key = entry.key;
-            if (keyRgx.matches(key)) {
+            if (key.matches(keyRgx)) {
                 toRemoveList.add(entry);
             }
         });
