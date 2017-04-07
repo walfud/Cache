@@ -59,7 +59,7 @@ public class MainActivity extends Activity {
         });
 
         //
-        mCache = new BitmapCache(this, 100L * 1024 * 1024, 1L * 1024 * 1024);
+        mCache = new BitmapCache(this, 8L * 1024 * 1024, 4L * 1024 * 1024);
     }
 
     private static class ViewHolder extends RecyclerView.ViewHolder {

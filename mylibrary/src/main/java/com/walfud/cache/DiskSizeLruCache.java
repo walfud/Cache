@@ -112,13 +112,21 @@ public abstract class DiskSizeLruCache<T> implements Cache<T>, SerializableAndDe
         String filename = HashUtils.md5(key);
         byte[] data = serialize(value);
         File file = new File(mCacheDir, filename);
-        IoUtils.output(toTmpFile(file), data);
+        File cached = IoUtils.output(toTmpFile(file), data);
+        if (cached == null) {
+            return;
+        }
+
         mCacheImpl.add(key, file);
     }
 
     @Override
     public T get(String key) {
         File file = mCacheImpl.get(key);
+        if (file == null || !file.exists() || !file.canRead()) {
+            return null;
+        }
+
         byte[] data = IoUtils.input(file);
         return deserialize(data);
     }
