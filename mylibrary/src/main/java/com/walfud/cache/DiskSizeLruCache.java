@@ -24,6 +24,7 @@ public abstract class DiskSizeLruCache<T> implements Cache<T>, SerializableAndDe
     private File mCacheDir;
     private File mIndexFile;
     private SizeLruCache<File> mCacheImpl;  // key: origin key, value: webp file
+    private OnEventListener<File> mOnEventListener;
 
     public DiskSizeLruCache(Context context, long cacheCapability) {
         mContext = context;
@@ -35,18 +36,26 @@ public abstract class DiskSizeLruCache<T> implements Cache<T>, SerializableAndDe
                 return value.length() + toTmpFile(value).length();
             }
         };
-        mCacheImpl.setOnEventListener(new Lru.OnEventListener<File>() {
+        mCacheImpl.setOnEventListener(new OnEventListener<File>() {
             @Override
             public void onAdd(String key, File value) {
                 File tmpFile = toTmpFile(value);
                 tmpFile.renameTo(new File(mCacheDir, HashUtils.md5(key)));
                 syncIndex();
+
+                if (mOnEventListener != null) {
+                    mOnEventListener.onAdd(key, value);
+                }
             }
 
             @Override
             public void onRemove(String key, File value) {
                 value.delete();
                 syncIndex();
+
+                if (mOnEventListener != null) {
+                    mOnEventListener.onRemove(key, value);
+                }
             }
         });
 
@@ -134,6 +143,10 @@ public abstract class DiskSizeLruCache<T> implements Cache<T>, SerializableAndDe
     @Override
     public void invalidate(String key) {
         mCacheImpl.invalidate(key);
+    }
+
+    public void setOnEventListener(OnEventListener onEventListener) {
+        mOnEventListener = onEventListener;
     }
 
     // internal

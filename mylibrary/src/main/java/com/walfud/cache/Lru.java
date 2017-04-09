@@ -108,10 +108,4 @@ public class Lru<T> {
             this.value = value;
         }
     }
-
-    public interface OnEventListener<T> {
-        void onAdd(String key, T value);
-
-        void onRemove(String key, T value);
-    }
 }
