@@ -113,11 +113,6 @@ public abstract class DiskSizeLruCache<T> implements Cache<T>, SerializableAndDe
 
     @Override
     public void add(String key, T value) {
-        File old = mCacheImpl.get(key);
-        if (old != null) {
-            return;
-        }
-
         String filename = HashUtils.md5(key);
         byte[] data = serialize(value);
         File file = new File(mCacheDir, filename);
