@@ -7,7 +7,7 @@ public interface Cache<T> {
 
     String TAG = "Cache";
 
-    void add(String key, T value);
+    void set(String key, T value);
 
     T get(String key);
 

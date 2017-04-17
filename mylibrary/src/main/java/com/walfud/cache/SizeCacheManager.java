@@ -85,17 +85,19 @@ public abstract class SizeCacheManager<T> implements Cache<T>, Sizable<T>, Seria
         return value;
     }
 
-    public void add(String key, T value) {
+    @Override
+    public void set(String key, T value) {
         set(key, value, true, true);
     }
     public void set(String key, T value, boolean memory, boolean disk) {
         if (memory) {
-            mMemoryCache.add(key, value);
+            mMemoryCache.set(key, value);
         }
         if (disk) {
-            mDiskCache.add(key, value);
+            mDiskCache.set(key, value);
         }
     }
+
     public void invalidate(String key) {
         invalidate(key, true, true);
     }

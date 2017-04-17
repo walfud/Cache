@@ -108,11 +108,11 @@ public abstract class DiskSizeLruCache<T> implements Cache<T>, SerializableAndDe
                 };
             }
         });
-        kv.forEach(entry -> mCacheImpl.add(entry.key, entry.value));
+        kv.forEach(entry -> mCacheImpl.set(entry.key, entry.value));
     }
 
     @Override
-    public void add(String key, T value) {
+    public void set(String key, T value) {
         String filename = HashUtils.md5(key);
         byte[] data = serialize(value);
         File file = new File(mCacheDir, filename);
@@ -121,7 +121,7 @@ public abstract class DiskSizeLruCache<T> implements Cache<T>, SerializableAndDe
             return;
         }
 
-        mCacheImpl.add(key, file);
+        mCacheImpl.set(key, file);
     }
 
     @Override
