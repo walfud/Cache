@@ -75,7 +75,7 @@ public abstract class SizeCacheManager<T> implements Cache<T>, Sizable<T>, Seria
         if (disk) {
             value = mDiskCache.get(key);
             if (value != null) {
-                set(key, value, true, false);                       // Touch memory cache
+                put(key, value, true, false);                       // Touch memory cache
                 Log.v(TAG, String.format("hit(disk): %s", key));
                 return value;
             }
@@ -86,15 +86,15 @@ public abstract class SizeCacheManager<T> implements Cache<T>, Sizable<T>, Seria
     }
 
     @Override
-    public void set(String key, T value) {
-        set(key, value, true, true);
+    public void put(String key, T value) {
+        put(key, value, true, true);
     }
-    public void set(String key, T value, boolean memory, boolean disk) {
+    public void put(String key, T value, boolean memory, boolean disk) {
         if (memory) {
-            mMemoryCache.set(key, value);
+            mMemoryCache.put(key, value);
         }
         if (disk) {
-            mDiskCache.set(key, value);
+            mDiskCache.put(key, value);
         }
     }
 

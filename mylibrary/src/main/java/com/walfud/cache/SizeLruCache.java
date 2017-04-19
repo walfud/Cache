@@ -40,7 +40,7 @@ public abstract class SizeLruCache<T> implements Cache<T>, Sizable<T> {
     }
 
     @Override
-    public void set(String key, T value) {
+    public void put(String key, T value) {
         mLru.set(key, value);
     }
 
