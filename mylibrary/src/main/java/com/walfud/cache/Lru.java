@@ -8,6 +8,7 @@ import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Deque;
 import java.util.List;
+import java.util.function.Predicate;
 
 /**
  * Created by walfud on 2015/11/16.
@@ -44,7 +45,7 @@ public class Lru<T> {
      * @return
      */
     public T get(String key) {
-        Entry<T> value = CollectionUtils.find(mContainer, key, (s, t) -> ObjectUtils.isEqual(s, t.key) ? 0 : -1);
+        Entry<T> value = CollectionUtils.find(mContainer, (Predicate<Entry<T>>) kv -> ObjectUtils.isEqual(kv.key, key));
         if (value == null) {
             return null;
         }
